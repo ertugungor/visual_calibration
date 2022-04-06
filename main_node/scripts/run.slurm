@@ -14,16 +14,20 @@ DEV_DIR=$HOME_DIR/dev
 ## $2= val or train
 ## #3= iteration number: (e.g. 1,2)
 
-if [ "$1" == "test" ]; then
+if [ "$1" = "test" ]; then
   # # Run dist_test.sh to obtain model results
   singularity exec \
     --nv \
     --bind $DATA_DIR:/workspace/data,$DEV_DIR:/workspace/dev \
-    library://ertugungor/default/image:latest $DEV_DIR/scripts/dist_test.sh
-else [ "$1" == "eval" ]
+    library://ertugungor/default/image:latest $DEV_DIR/visual_calibration/main_node/scripts/dist_test.sh $2
+else [ "$1" = "eval" ]
   # Run eval.sh to evaluate model results from previous step (AP, oLRP computation)
   singularity exec \
     --nv \
     --bind $DATA_DIR:/workspace/data,$DEV_DIR:/workspace/dev \
-    library://ertugungor/default/image:latest $DEV_DIR/scripts/eval.sh $2 $3
+    library://ertugungor/default/image:latest $DEV_DIR/visual_calibration/main_node/scripts/eval.sh $2 $3
 fi
+
+## sbatch /home/ertugrul/dev/visual_calibration/main_node/scripts/run.slurm test train/val
+## sbatch /home/ertugrul/dev/visual_calibration/main_node/scripts/run.slurm eval train/val 1/2/3
+
