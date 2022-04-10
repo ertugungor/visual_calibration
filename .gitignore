@@ -127,3 +127,7 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+
+# Input data to analyze, for now it's not required to push them.
+# In future, I may store them in git as LFS files.
+data/
