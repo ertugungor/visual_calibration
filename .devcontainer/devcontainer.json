@@ -1,0 +1,32 @@
+// For format details, see https://aka.ms/vscode-remote/devcontainer.json or the definition README at
+// https://github.com/microsoft/vscode-dev-containers/tree/master/containers/cpp
+{
+  "name": "denge-dev-container",
+  "image": "mmdetection_image",
+  "runArgs": [
+  "--privileged",
+    "--cap-add=SYS_PTRACE",
+    "--cap-add=NET_ADMIN",
+    "--net=host",
+    "--security-opt",
+    "seccomp=unconfined",
+  ],
+  "updateRemoteUserUID": true,
+  "workspaceMount": "source=${localWorkspaceFolder},target=/workspace/visual_calibration,type=bind,consistency=consistent",
+  "workspaceFolder": "/workspace/visual_calibration",
+
+  // Use 'settings' to set *default* container specific settings.json values on container create.
+  // You can edit these settings after create using File > Preferences > Settings > Remote.
+  "settings": {
+    "terminal.integrated.shell.linux": "/bin/bash",
+    "editor.mouseWheelZoom": true,
+    "python.pythonPath": "/usr/local/bin/python",
+    "git.detectSubmodulesLimit": 20,
+    "git.ignoreLimitWarning": true,
+  },
+
+  // Add the IDs of extensions you want installed when the container is created in the array below.
+  "extensions": [
+    "ms-python.python",
+  ]
+}
