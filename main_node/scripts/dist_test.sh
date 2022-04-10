@@ -25,5 +25,5 @@ fi
 $DEV_DIR/mmdetection/tools/dist_test.sh \
   $CONFIG_FILE \
   $DATA_DIR/mmdetection/checkpoints/mask_rcnn_r50_fpn_sample1e-3_mstrain_1x_lvis_v1-aa78ac3d.pth \
-  4 --eval bbox --eval-options "jsonfile_prefix=$DATA_DIR/mask_rcnn_test_results"
+  2 --eval bbox --eval-options "jsonfile_prefix=$DATA_DIR/mask_rcnn_test_results"
 
