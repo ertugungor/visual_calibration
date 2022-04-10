@@ -21,12 +21,14 @@ elif [ "$1" = "val" ]; then
     python3 $DEV_DIR/LRP-Error/lvis-api/demo.py \
         $DATA_DIR/lvis_v1/annotations/lvis_v1_val.json \
         $DATA_DIR/mask_rcnn_lvis_results/val_set/$2/mask_rcnn_test_results.bbox.json \
-        bbox
+        bbox \
+        "val"
   elif [ "$1" = "train" ]; then
     python3 $DEV_DIR/LRP-Error/lvis-api/demo.py \
         $DATA_DIR/lvis_v1/annotations/lvis_v1_train.json \
         $DATA_DIR/mask_rcnn_lvis_results/train_set/$2/mask_rcnn_test_results.bbox.json \
-        bbox
+        bbox \
+        "train"
   fi
 fi
 
