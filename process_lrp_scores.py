@@ -263,8 +263,8 @@ def plot_basic(x, y_axises, colors, curve_labels, axis_labels, title, fig_name):
   plt.savefig(fig_name)
   plt.cla()
 
-def obtain_score_distribution(iterations, data_keys, dataset_types):
-  results_data = read_data(iterations, data_keys, dataset_types)
+def obtain_score_distribution(iterations, data_keys, dataset_types, model_dataset_type):
+  results_data = read_data(iterations, data_keys, dataset_types, model_dataset_type)
   val_avg_scores = []
   for iter in iterations:
     values = results_data[iter]
@@ -295,16 +295,17 @@ def obtain_score_distribution(iterations, data_keys, dataset_types):
 
   x_points = list(range(1203))
   colors=['red', 'blue']
+  fig_path = path.join(RESULTS_STATS_PATH_PREFIX, "score_distribution", "val_score_dist.png")
   plot_basic(x_points, val_avg_scores, colors, ["iter #0", "iter #1"],
             ["cat_id", "avg_score"], "Val set score distribution wrt iterations",
-            "val_score_dist.png")
+            fig_path)
 
 if __name__ == "__main__":
-  iterations = [0]
+  # iterations = [0,1]
   # # create slrp plots for given iterations for given experiment. each plot shows train and val slrp curves
   # create_plots(iterations, "mask_rcnn_lvis_results")
 
-  # obtain average s* statistics of given iterations
+  # obtain average s* statistics of givesn iterations
   # count_settings = [(True,True), (True,False), (False,True), (False,False)]
   # obtain_slrp_stats(iterations, "mask_rcnn_lvis_results", count_settings)
 
@@ -312,4 +313,4 @@ if __name__ == "__main__":
 
   # data_keys = ["dt_scores", "tps", "fps"]
   # dataset_types = ["val"]
-  # obtain_score_distribution([0,1], data_keys, dataset_types)
+  # obtain_score_distribution([0,1], data_keys, dataset_types, "mask_rcnn_lvis_results")
