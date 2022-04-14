@@ -13,20 +13,32 @@ DATA_DIR=/workspace/data
 
 ## $1= dataset type "train" or "val"
 ## #2= iteration number: (e.g. 1,2)
+## $3 = dataset name: lvis or coco
 
 if [ ! $# -eq 2 ]; then
   echo "Wrong number of arguments"
   exit 1
 elif [ "$1" = "val" ]; then
-  python3 $DEV_DIR/LRP-Error/lvis-api/demo.py \
-      $DATA_DIR/lvis_v1/annotations/lvis_v1_val.json \
-      $DATA_DIR/mask_rcnn_lvis_results/val_set/$2/test/mask_rcnn_test_results.bbox.json \
-      bbox \
-      "val"
+  if [ "$2" = "coco" ]; then
+    ANNOTATION_FILE=$DATA_DIR/coco/annotations/instances_val2017.json
+    RESULT_FILE=$DATA_DIR/mask_rcnn_coco_results/val_set/$2/test/mask_rcnn_test_results.bbox.json
+  elif [ "$2" = "lvis"]; then
+    ANNOTATION_FILE=$DATA_DIR/lvis_v1/annotations/lvis_v1_val.json
+    RESULT_FILE=$DATA_DIR/mask_rcnn_lvis_results/val_set/$2/test/mask_rcnn_test_results.bbox.json
+  fi
 elif [ "$1" = "train" ]; then
-  python3 $DEV_DIR/LRP-Error/lvis-api/demo.py \
-      $DATA_DIR/lvis_v1/annotations/lvis_v1_train.json \
-      $DATA_DIR/mask_rcnn_lvis_results/train_set/$2/test/mask_rcnn_test_results.bbox.json \
-      bbox \
-      "train"
+  if [ "$2" = "coco" ]; then
+    ANNOTATION_FILE=$DATA_DIR/coco/annotations/instances_train2017.json
+    RESULT_FILE=$DATA_DIR/mask_rcnn_coco_results/train_set/$2/test/mask_rcnn_test_results.bbox.json
+  elif [ "$2" = "lvis"]; then
+    ANNOTATION_FILE=$DATA_DIR/lvis_v1/annotations/lvis_v1_train.json
+    RESULT_FILE=$DATA_DIR/mask_rcnn_lvis_results/train_set/$2/test/mask_rcnn_test_results.bbox.json
+  fi
 fi
+
+python3 $DEV_DIR/LRP-Error/lvis-api/demo.py \
+    $ANNOTATION_FILE \
+    $RESULT_FILE \
+    bbox \
+    $1
+
