@@ -12,10 +12,10 @@ DATA_DIR=/workspace/data
 # 5- This script produces lrp optimal results, move them to a proper place
 
 ## $1= dataset type "train" or "val"
-## #2= iteration number: (e.g. 1,2)
+## $2= iteration number: (e.g. 1,2)
 ## $3 = dataset name: lvis or coco
 
-if [ ! $# -eq 2 ]; then
+if [ ! $# -eq 3 ]; then
   echo "Wrong number of arguments"
   exit 1
 elif [ "$1" = "val" ]; then
