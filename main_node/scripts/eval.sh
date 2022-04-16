@@ -19,24 +19,24 @@ if [ ! $# -eq 3 ]; then
   echo "Wrong number of arguments"
   exit 1
 elif [ "$1" = "val" ]; then
-  if [ "$2" = "coco" ]; then
+  if [ "$3" = "coco" ]; then
     ANNOTATION_FILE=$DATA_DIR/coco/annotations/instances_val2017.json
     RESULT_FILE=$DATA_DIR/mask_rcnn_coco_results/val/$2/test/mask_rcnn_test_results.bbox.json
-  elif [ "$2" = "lvis"]; then
+  elif [ "$3" = "lvis"]; then
     ANNOTATION_FILE=$DATA_DIR/lvis_v1/annotations/lvis_v1_val.json
     RESULT_FILE=$DATA_DIR/mask_rcnn_lvis_results/val/$2/test/mask_rcnn_test_results.bbox.json
   fi
 elif [ "$1" = "train" ]; then
-  if [ "$2" = "coco" ]; then
+  if [ "$3" = "coco" ]; then
     ANNOTATION_FILE=$DATA_DIR/coco/annotations/instances_train2017.json
     RESULT_FILE=$DATA_DIR/mask_rcnn_coco_results/train/$2/test/mask_rcnn_test_results.bbox.json
-  elif [ "$2" = "lvis"]; then
+  elif [ "$3" = "lvis"]; then
     ANNOTATION_FILE=$DATA_DIR/lvis_v1/annotations/lvis_v1_train.json
     RESULT_FILE=$DATA_DIR/mask_rcnn_lvis_results/train/$2/test/mask_rcnn_test_results.bbox.json
   fi
 fi
 
-echo "eval script is being run with $1 dataset type.. and $2 dataset"
+echo "eval script is being run with $1 dataset type and $3 dataset"
 echo "using the annotation file: $ANNOTATION_FILE"
 echo "using the result file: $RESULT_FILE"
 

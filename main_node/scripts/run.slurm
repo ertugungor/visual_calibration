@@ -12,8 +12,8 @@ DEV_DIR=$HOME_DIR/dev
 
 ## $1 = eval or test
 ## $2 = val or train
-## $3 = iteration number: (e.g. 1,2) for eval / dataset name: lvis or coco for test
-## $4 = dataset name: lvis or coco for eval
+## $3 = iteration number: (e.g. 1,2) for eval.sh / dataset name: lvis or coco for dist_test.sh
+## $4 = dataset name: lvis or coco for eval.sh
 
 if [ "$1" = "test" ]; then
   # # Run dist_test.sh to obtain model results

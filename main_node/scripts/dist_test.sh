@@ -35,7 +35,7 @@ elif [ "$1" = "train" ]; then
   fi
 fi
 
-echo "dist_test script is being run with $1 dataset type.. and $2 dataset"
+echo "dist_test script is being run with $1 dataset type and $2 dataset"
 echo "using the config file: $CONFIG_FILE"
 echo "using the checkpoint file: $CHECKPOINT_FILE"
 
