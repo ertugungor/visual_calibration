@@ -36,12 +36,22 @@ elif [ "$1" = "train" ]; then
   fi
 fi
 
+if [ "$3" = "coco" ]; then
+  SCRIPT_FILE=$DEV_DIR/LRP-Error/pycocotools/demo.py
+elif [ "$3" = "lvis"]; then
+  SCRIPT_FILE=$DEV_DIR/LRP-Error/lvis-api/demo.py
+else
+  echo "Unknown dataset!"
+  exit 1
+fi
+
 echo "eval script is being run with $1 dataset type and $3 dataset"
+echo "the script $SCRIPT_FILE will be run.."
 echo "using the annotation file: $ANNOTATION_FILE"
 echo "using the result file: $RESULT_FILE"
 
-python3 $DEV_DIR/LRP-Error/lvis-api/demo.py \
-    $ANNOTATION_FILE \
-    $RESULT_FILE \
-    bbox \
-    $1
+python3 $SCRIPT_FILE \
+        $ANNOTATION_FILE \
+        $RESULT_FILE \
+        bbox \
+        $1
