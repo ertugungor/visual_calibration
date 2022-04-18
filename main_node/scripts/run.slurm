@@ -20,13 +20,13 @@ if [ "$1" = "test" ]; then
   singularity exec \
     --nv \
     --bind $DATA_DIR:/workspace/data,$DEV_DIR:/workspace/dev \
-    library://ertugungor/default/image:latest $DEV_DIR/visual_calibration/main_node/scripts/dist_test.sh $2 $3
+    library://ertugungor/calibration/default:v2 $DEV_DIR/visual_calibration/main_node/scripts/dist_test.sh $2 $3
 else [ "$1" = "eval" ]
   # Run eval.sh to evaluate model results from previous step (AP, oLRP computation)
   singularity exec \
     --nv \
     --bind $DATA_DIR:/workspace/data,$DEV_DIR:/workspace/dev \
-    library://ertugungor/default/image:latest $DEV_DIR/visual_calibration/main_node/scripts/eval.sh $2 $3 $4
+    library://ertugungor/calibration/default:v2 $DEV_DIR/visual_calibration/main_node/scripts/eval.sh $2 $3 $4
 fi
 
 ## sbatch /home/ertugrul/dev/visual_calibration/main_node/scripts/run.slurm test train/val lvis/coco
