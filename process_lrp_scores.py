@@ -5,13 +5,19 @@ from matplotlib import pyplot as plt
 from lvis_cls_mapping import index_to_freq_group
 from lvis_cls_mapping import CLASSES
 from os import path
-from os import mkdir
-from os import mkdir, path, remove
+from os import makedirs, path, remove
 
 # These paths are based on the container mounting configuration in devcontainer.json file
 INPUT_DATA_PATH_PREFIX = "/workspace/visual_calibration/data/"
-RESULTS_STATS_PATH_PREFIX = "/workspace/visual_calibration/data/analysis/stats"
-RESULTS_PLOTS_PATH_PREFIX = "/workspace/visual_calibration/data/analysis/plots"
+
+CYAN_COLOR_HEX = "#60dbd1"
+ORANGE_COLOR_HEX = "#ffa500"
+
+def get_stats_path(dataset_type):
+  return  f"/workspace/visual_calibration/data/{dataset_type}/analysis/stats"
+
+def get_plots_path(dataset_type):
+  return  f"/workspace/visual_calibration/data/{dataset_type}/analysis/plots"
 
 def transform(data, type):
   if type == "lrp":
@@ -49,7 +55,7 @@ def draw_slrp_plot(x_points, y_points, colors, curve_labels, axis_labels, title,
   plt.ylabel(axis_labels[1], fontsize=10)
 
   plt.title(title)
-  plt.savefig(fig_name)
+  plt.savefig(fig_name, format='svg', dpi=1200)
   plt.cla()
 
 """
@@ -70,9 +76,9 @@ def create_plots(iterations, model_dataset_type):
     val_lrp_values, val_dt_scores = values["val_lrp_values"], values["val_dt_scores"]
     train_lrp_values, train_dt_scores = values["train_lrp_values"], values["train_dt_scores"]
 
-    dir_path = path.join(RESULTS_PLOTS_PATH_PREFIX, str(iter))
+    dir_path = path.join(get_plots_path(model_dataset_type), str(iter))
     if not path.isdir(dir_path):
-      mkdir(dir_path)
+      makedirs(dir_path)
 
     for key in train_lrp_values:
       (cat_id,area_id) = key
@@ -117,7 +123,7 @@ def create_plots(iterations, model_dataset_type):
       cls_name = CLASSES[cat_id]
       fig_name = path.join(dir_path, f"{cat_id}_{cls_name}.png")
       if not path.isdir(dir_path):
-        mkdir(dir_path)
+        makedirs(dir_path)
 
       title = f"{cls_name}({cls_freq_group})"
       if (train_scores is not None and train_lrps is not None):
@@ -143,10 +149,10 @@ def obtain_slrp_stats(iterations, model_dataset_type, count_settings):
       num_nans = { "rare":0, "common":0, "frequent":0}
       num_negs = { "rare":0, "common":0, "frequent":0}
 
-      dir_path = path.join(RESULTS_STATS_PATH_PREFIX, str(iter))
+      dir_path = path.join(get_stats_path(model_dataset_type), str(iter))
       stats_out_path = path.join(dir_path, f"{dataset_type}_opt_thr_stats.txt")
       if not path.isdir(dir_path):
-        mkdir(dir_path)
+        makedirs(dir_path)
       if path.isfile(stats_out_path):
         remove(stats_out_path)
 
@@ -197,11 +203,17 @@ def obtain_slrp_stats(iterations, model_dataset_type, count_settings):
             out_file.write(f"{key}_avg => {avg:.4f}\n")
           out_file.write("\n")
 
-def draw_slrp_opt_plot(x_points, y_points, axis_labels, title, fig_name):
-  plt.scatter(x_points, y_points)
-  plt.legend()
+def draw_slrp_opt_plot(train_slrp, val_slrp, axis_labels, title, fig_name):
+  train_cls_indices, train_values = map(list, zip(*train_slrp))
+  val_cls_indices, val_values = map(list, zip(*val_slrp))
 
-  plt.xlim(-1.010, 1.260)
+  plt.scatter(train_cls_indices, train_values, color=CYAN_COLOR_HEX)
+  plt.scatter(val_cls_indices, val_values, color=ORANGE_COLOR_HEX)
+  plt.legend(labels=["train", "val"])
+
+  # x axis is the lvis class id
+  plt.xlim(0, 1203)
+
   plt.ylim(-1.010, 1.260)
 
   plt.xlabel(axis_labels[0], fontsize=10)
@@ -216,9 +228,9 @@ def obtain_slrp_scatter_plots(iterations, model_dataset_type):
     train_lrp_opt_thr_path = path.join(INPUT_DATA_PATH_PREFIX, model_dataset_type, "train", str(iter), "eval", "train_lrp_opt_thr")
     val_lrp_opt_thr_path = path.join(INPUT_DATA_PATH_PREFIX, model_dataset_type, "val", str(iter), "eval", "val_lrp_opt_thr")
 
-    dir_path = path.join(RESULTS_STATS_PATH_PREFIX, str(iter))
+    dir_path = path.join(get_stats_path(model_dataset_type), str(iter))
     if not path.isdir(dir_path):
-      mkdir(dir_path)
+      makedirs(dir_path)
 
     with open(train_lrp_opt_thr_path, 'rb') as train_lrp_opt_thr_file, open(val_lrp_opt_thr_path, 'rb') as val_lrp_opt_thr_file:
       train_lrp_opt_thrs = pickle.load(train_lrp_opt_thr_file)
@@ -226,7 +238,7 @@ def obtain_slrp_scatter_plots(iterations, model_dataset_type):
 
       train_points = {"rare":[], "common":[], "frequent":[]}
       val_points = {"rare":[], "common":[], "frequent":[]}
-      axis_labels = ["train", "val"]
+      axis_labels = ["Category Index", "s*"]
 
       count=0
       for cat_id,val in enumerate(train_lrp_opt_thrs):
@@ -236,10 +248,10 @@ def obtain_slrp_scatter_plots(iterations, model_dataset_type):
         train_val = 1.25 if np.isnan(val) else val
         vald_val = 1.25 if np.isnan(val_lrp_opt_thrs[cat_id]) else val_lrp_opt_thrs[cat_id]
         cls_freq_group = index_to_freq_group(cat_id)
-        train_points[cls_freq_group].append(train_val)
-        val_points[cls_freq_group].append(vald_val)
+        train_points[cls_freq_group].append((cat_id, train_val))
+        val_points[cls_freq_group].append((cat_id, vald_val))
       for cls_freq_group in train_points.keys():
-        fig_name = path.join(dir_path, f"{cls_freq_group}_slrp_opt.png")
+        fig_name = path.join(dir_path, f"{cls_freq_group}_slrp_opt.svg")
         title = f"{cls_freq_group} s* values"
         draw_slrp_opt_plot(train_points[cls_freq_group], val_points[cls_freq_group], axis_labels, title, fig_name)
       print(count)
@@ -249,30 +261,28 @@ def obtain_slrp_scatter_plots(iterations, model_dataset_type):
           count2+=1
       print(count2)
 
-def plot_basic(x, y_axises, colors, curve_labels, axis_labels, title, fig_name):
+def draw_score_distributions(x, y_axises, colors, curve_labels, axis_labels, title, fig_name):
   plt.gca().set_prop_cycle(color=colors)
   for i in range(len(y_axises)):
     plt.scatter(x,y_axises[i],label=curve_labels[i])
 
-  plt.ylim(0, 1.1)
+  plt.ylim(-0.5, 1.1)
 
   plt.title(title,fontsize=15)
   plt.xlabel(axis_labels[0],fontsize=13)
   plt.ylabel(axis_labels[1],fontsize=13)
   plt.legend()
-  plt.savefig(fig_name)
+  plt.savefig(fig_name, format='svg', dpi=1200)
   plt.cla()
 
 def obtain_score_distribution(iterations, data_keys, dataset_types, model_dataset_type):
   results_data = read_data(iterations, data_keys, dataset_types, model_dataset_type)
-  val_avg_scores = []
+  iter_scores = []
   for iter in iterations:
     values = results_data[iter]
 
     val_dt_scores_map = values["val_dt_scores"]
-
-    cat_avg_scores_map = list(range(1203))
-    count_map = {"rare":0, "common":0, "frequent":0}
+    cat_avg_score_map = {"rare":[], "common":[], "frequent":[]}
     for key in val_dt_scores_map:
       (cat_id,area_id) = key
       # consider "all" area type
@@ -282,35 +292,51 @@ def obtain_score_distribution(iterations, data_keys, dataset_types, model_datase
 
       if scores is not None:
         sum = np.sum(scores)
-        for score in scores:
-          if score >1:
-            count_map[index_to_freq_group(cat_id)]+=1
         avg = sum/len(scores)
       else:
-        avg = 0
-      cat_avg_scores_map[cat_id] = avg
-    print(count_map)
-    val_avg_scores.append(cat_avg_scores_map)
+        # To discriminate no detection values in the plots, prev iteration
+        # will have -0.2 and next iteration will have -0.4 values. These
+        # are just random values for better visualization
+        if len(iter_scores) == 0:
+          avg = -0.2
+        else:
+          avg = -0.4
+      cat_avg_score_map[index_to_freq_group(cat_id)].append((cat_id, avg))
+    iter_scores.append(cat_avg_score_map)
 
+  # process two iterations in one plot
+  for iter_idx in range(0, len(iterations), 2):
+    for cat in ["rare", "common", "frequent"]:
+      prev_cat_indices, prev_avg_scores = map(list, zip(*iter_scores[iter_idx][cat]))
+      # indices are the same, no assignemnt for next indices
+      _, next_avg_scores = map(list, zip(*iter_scores[iter_idx+1][cat]))
 
-  x_points = list(range(1203))
-  colors=['red', 'blue']
-  fig_path = path.join(RESULTS_STATS_PATH_PREFIX, "score_distribution", "val_score_dist.png")
-  plot_basic(x_points, val_avg_scores, colors, ["iter #0", "iter #1"],
-            ["cat_id", "avg_score"], "Val set score distribution wrt iterations",
-            fig_path)
+      colors=[CYAN_COLOR_HEX, ORANGE_COLOR_HEX]
+      dir_path = path.join(get_stats_path(model_dataset_type), "score_distribution")
+      if not path.isdir(dir_path):
+        makedirs(dir_path)
+      fig_path = path.join(dir_path, f"{cat}_{iter_idx}-{iter_idx+1}_val_score_dist.svg")
+      draw_score_distributions(prev_cat_indices, [prev_avg_scores, next_avg_scores], colors, [f"iter #{iter_idx}", f"iter #{iter_idx+1}"],
+                ["Category Index", "Average Confidence Score"], f"Val set score distribution wrt iterations ({cat})",
+                fig_path)
 
-if __name__ == "__main__":
-  # iterations = [0,1]
-  # # create slrp plots for given iterations for given experiment. each plot shows train and val slrp curves
-  # create_plots(iterations, "mask_rcnn_lvis_results")
+def analyze(dataset_result):
+  iterations = [0,1]
+  # create slrp plots for given iterations for given experiment. each plot shows train and val slrp curves
+  # create_plots(iterations, dataset_result)
 
   # obtain average s* statistics of givesn iterations
   # count_settings = [(True,True), (True,False), (False,True), (False,False)]
-  # obtain_slrp_stats(iterations, "mask_rcnn_lvis_results", count_settings)
+  # obtain_slrp_stats(iterations, dataset_result, count_settings)
 
-  # obtain_slrp_scatter_plots(iterations, "mask_rcnn_lvis_results")
+  obtain_slrp_scatter_plots(iterations, dataset_result)
 
-  # data_keys = ["dt_scores", "tps", "fps"]
-  # dataset_types = ["val"]
-  # obtain_score_distribution([0,1], data_keys, dataset_types, "mask_rcnn_lvis_results")
+  data_keys = ["dt_scores"]
+  ## add train set score distribution, it's not supported yet
+  # dataset_types = ["val", "train"]
+  dataset_types = ["val"]
+  obtain_score_distribution([0,1], data_keys, dataset_types, dataset_result)
+
+if __name__ == "__main__":
+  analyze("mask_rcnn_lvis_results")
+  # analyze("mask_rcnn_coco_results")
