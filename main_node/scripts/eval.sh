@@ -22,7 +22,7 @@ elif [ "$1" = "val" ]; then
   if [ "$3" = "coco" ]; then
     ANNOTATION_FILE=$DATA_DIR/coco/annotations/instances_val2017.json
     RESULT_FILE=$DATA_DIR/mask_rcnn_coco_results/val/$2/test/mask_rcnn_test_results.bbox.json
-  elif [ "$3" = "lvis"]; then
+  elif [ "$3" = "lvis" ]; then
     ANNOTATION_FILE=$DATA_DIR/lvis_v1/annotations/lvis_v1_val.json
     RESULT_FILE=$DATA_DIR/mask_rcnn_lvis_results/val/$2/test/mask_rcnn_test_results.bbox.json
   fi
@@ -30,7 +30,7 @@ elif [ "$1" = "train" ]; then
   if [ "$3" = "coco" ]; then
     ANNOTATION_FILE=$DATA_DIR/coco/annotations/instances_train2017.json
     RESULT_FILE=$DATA_DIR/mask_rcnn_coco_results/train/$2/test/mask_rcnn_test_results.bbox.json
-  elif [ "$3" = "lvis"]; then
+  elif [ "$3" = "lvis" ]; then
     ANNOTATION_FILE=$DATA_DIR/lvis_v1/annotations/lvis_v1_train.json
     RESULT_FILE=$DATA_DIR/mask_rcnn_lvis_results/train/$2/test/mask_rcnn_test_results.bbox.json
   fi
@@ -38,7 +38,7 @@ fi
 
 if [ "$3" = "coco" ]; then
   SCRIPT_FILE=$DEV_DIR/LRP-Error/pycocotools/demo.py
-elif [ "$3" = "lvis"]; then
+elif [ "$3" = "lvis" ]; then
   SCRIPT_FILE=$DEV_DIR/LRP-Error/lvis-api/demo.py
 else
   echo "Unknown dataset!"
