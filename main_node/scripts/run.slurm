@@ -10,6 +10,16 @@ HOME_DIR=/home/ertugrul
 DATA_DIR=$HOME_DIR/data
 DEV_DIR=$HOME_DIR/dev
 
+# singularity exec \
+#     --nv \
+#     --bind $DATA_DIR:/workspace/data,$DEV_DIR:/workspace/dev \
+#     library://ertugungor/calibration/default:v2 \
+#     python $DEV_DIR/mmdetection/tools/train.py $DEV_DIR/mmdetection/configs/faster_rcnn/faster_rcnn_r50_fpn_1x_coco_subset_train.py
+#     # python $DEV_DIR/mmdetection/tools/train.py $DEV_DIR/mmdetection/configs/mask_rcnn/mask_rcnn_r50_fpn_1x_coco_subset_train.py
+#     # python3 $DEV_DIR/coco_subsample.py
+#     # python $DEV_DIR/mmdetection/tools/train.py $DEV_DIR/mmdetection/configs/faster_rcnn/faster_rcnn_r50_fpn_1x_coco.py
+# exit 0
+
 ## $1 = eval or test
 ## $2 = val or train
 ## $3 = iteration number: (e.g. 1,2) for eval.sh / dataset name: lvis or coco for dist_test.sh

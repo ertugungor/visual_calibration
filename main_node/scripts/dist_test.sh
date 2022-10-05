@@ -1,5 +1,8 @@
 # DEV_DIR and DATA_DIR are mounted directories into singularity container
 
+# The data the forward pass will be performed is determined with the test element
+# of data dictionary in CONFIG_FILE. Set this element accordingly.
+
 DEV_DIR=/workspace/dev
 DATA_DIR=/workspace/data
 
@@ -19,16 +22,26 @@ if [ ! $# -eq 2 ]; then
   exit 1
 elif [ "$1" = "val" ]; then
   if [ "$2" = "coco" ]; then
-    CHECKPOINT_FILE=$DATA_DIR/mmdetection/checkpoints/mask_rcnn_r50_fpn_1x_coco_20200205-d4b0c5d6.pth
-    CONFIG_FILE=$DEV_DIR/mmdetection/configs/mask_rcnn/mask_rcnn_r50_fpn_1x_coco_val.py
-  elif [ "$2" = "lvis"]; then
+    # CHECKPOINT_FILE=$DATA_DIR/mmdetection/checkpoints/mask_rcnn_r50_fpn_1x_coco_20200205-d4b0c5d6.pth
+    # CONFIG_FILE=$DEV_DIR/mmdetection/configs/mask_rcnn/mask_rcnn_r50_fpn_1x_coco_val.py
+    # CHECKPOINT_FILE=$HOME/work_dirs/faster_rcnn_r50_fpn_1x_coco_subset_train/epoch_12.pth
+
+    CONFIG_FILE=$DEV_DIR/mmdetection/configs/faster_rcnn/faster_rcnn_r50_fpn_1x_coco_subset_val.py
+    # 2x training
+    # CHECKPOINT_FILE=$HOME/training_data/faster_rcnn_r50_fpn_2x_coco_subset_train/epoch_24.pth
+
+    # 2x + oversampling
+    CHECKPOINT_FILE=$HOME/training_data/faster_rcnn_r50_fpn_2x_coco_subset_train_oversampling/epoch_24.pth
+  elif [ "$2" = "lvis" ]; then
     CHECKPOINT_FILE=$DATA_DIR/mmdetection/checkpoints/mask_rcnn_r50_fpn_sample1e-3_mstrain_1x_lvis_v1-aa78ac3d.pth
     CONFIG_FILE=$DEV_DIR/mmdetection/configs/lvis/mask_rcnn_r50_fpn_sample1e-3_mstrain_1x_lvis_v1_val.py
   fi
 elif [ "$1" = "train" ]; then
   if [ "$2" = "coco" ]; then
-    CHECKPOINT_FILE=$DATA_DIR/mmdetection/checkpoints/mask_rcnn_r50_fpn_1x_coco_20200205-d4b0c5d6.pth
+    # CHECKPOINT_FILE=$DATA_DIR/mmdetection/checkpoints/mask_rcnn_r50_fpn_1x_coco_20200205-d4b0c5d6.pth
     CONFIG_FILE=$DEV_DIR/mmdetection/configs/mask_rcnn/mask_rcnn_r50_fpn_1x_coco_train.py
+    # 2x + oversampling
+    CHECKPOINT_FILE=$HOME/training_data/faster_rcnn_r50_fpn_2x_coco_subset_train_oversampling/epoch_24.pth
   elif [ "$2" = "lvis" ]; then
     CHECKPOINT_FILE=$DATA_DIR/mmdetection/checkpoints/mask_rcnn_r50_fpn_sample1e-3_mstrain_1x_lvis_v1-aa78ac3d.pth
     CONFIG_FILE=$DEV_DIR/mmdetection/configs/lvis/mask_rcnn_r50_fpn_sample1e-3_mstrain_1x_lvis_v1_train.py
@@ -42,7 +55,7 @@ echo "using the checkpoint file: $CHECKPOINT_FILE"
 $DEV_DIR/mmdetection/tools/dist_test.sh \
   $CONFIG_FILE \
   $CHECKPOINT_FILE \
-  2 --eval bbox --eval-options "jsonfile_prefix=$DATA_DIR/mask_rcnn_test_results"
+  1 --eval bbox --eval-options "jsonfile_prefix=$DATA_DIR/$1_test_results"
 
 # Model checkpoints
 
